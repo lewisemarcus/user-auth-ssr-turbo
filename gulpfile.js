@@ -47,7 +47,7 @@ gulp.task(
     "es6-es5",
     gulp.series("js", async function () {
         return gulp
-            .src(["./src/*/**.js", "./src/*/*/**.js"])
+            .src(["./src/*/**.js", "./src/*/*/**.js", "./src/server-index.js"])
             .pipe(to5())
             .pipe(gulp.dest("./public/dist/es5/"))
     }),

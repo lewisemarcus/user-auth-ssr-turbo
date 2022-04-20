@@ -1,31 +1,56 @@
 // Full Documentation - https://docs.turbo360.co
-const express = require('express')
+const express = require("express")
 const router = express.Router()
 
-/*  This is the home route. It renders the index.mustache page from the views directory.
-  Data is rendered using the Mustache templating engine. For more
-  information, view here: https://mustache.github.io/#demo */
-router.get('/', (req, res) => {
-  res.render('index', { text: 'This is the dynamic data. Open index.js from the routes directory to see.' })
-})
+const React = require("react")
+const ReactDOMServer = require("react-dom/server")
 
-/*  This route render json data */
-router.get('/json', (req, res) => {
-  res.json({
-    confirmation: 'success',
-    app: process.env.TURBO_APP_ID,
-    data: 'this is a sample json route.'
-  })
-})
+//import our own React components
+const pkg_json = require("../package.json")
+const serverIndex = require("../public/dist/es5/server-index")
+const containers = require("../public/dist/es5/components/containers")
+const store = require("../public/dist/es5/stores")
+const turbo = require("turbo360")({ site_id: pkg_json.app })
+router.get("/", async (req, res) => {
+    let initial = {
+        user: {
+            currentUser: {
+                username: "TEST!",
+            },
+        },
+    }
 
-/*  This route sends text back as plain text. */
-router.get('/send', (req, res) => {
-  res.send('This is the Send Route')
-})
+    if (req.vertexSession != null && req.vertexSession.user != null) {
+        try {
+            const foundUser = await turbo.fetchOne(
+                "user",
+                req.vertexSession.user.id,
+            )
+            initial["user"] = { currentUser: foundUser }
+            const initialState = store.configure(initial)
 
-/*  This route redirects requests to Turbo360. */
-router.get('/redirect', (req, res) => {
-  res.redirect('https://www.turbo360.co/landing')
+            const admin = React.createElement(containers.Admin)
+            const entry = React.createElement(serverIndex, {
+                component: admin,
+                store: initialState,
+            })
+
+            const html = ReactDOMServer.renderToString(entry)
+
+            res.render("index", {
+                react: html,
+                initialState: JSON.stringify(initialState.getState()),
+            })
+        } catch (err) {
+            res.json({
+                confirmation: "fail",
+                data: err.message,
+            })
+        }
+    }
+})
+router.get("/auth", async (req, res) => {
+    res.render("auth", null)
 })
 
 module.exports = router

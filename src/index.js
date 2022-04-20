@@ -2,7 +2,7 @@ import React, { Component } from "react"
 import ReactDOM from "react-dom"
 import store from "./stores"
 import { Provider } from "react-redux"
-import Intro from "./components/Intro"
+import { Admin } from "./components/containers/index"
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * *
 	This is the entry point of the React app with Redux
@@ -11,10 +11,10 @@ import Intro from "./components/Intro"
 	to remove it and replace with your own visual content.
 * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 */
-
+const initialState = window.__INITIAL_STATE__
 const app = (
-    <Provider store={store.configure(null)}>
-        <Intro />
+    <Provider store={store.configure(initialState)}>
+        <Admin />
     </Provider>
 )
 

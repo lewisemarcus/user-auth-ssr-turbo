@@ -1,8 +1,12 @@
 {
     "name": "user-auth",
+    "engines": {
+        "node": "^14"
+    },
     "version": "0.0.0",
     "server": false,
     "private": true,
+    "app": "625d320c7163fa00163f0b4d",
     "scripts": {
         "start": "node ./bin/www",
         "serve": "turbo devserver",
